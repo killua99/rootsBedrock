@@ -51,7 +51,7 @@ FROM base-bedrock as bedrock
 
 RUN set -ex; \
   mkdir /www; \
-  cd /www && composer create-project roots/bedrock webroot && cd webroot && composer require roots/wp-password-bcrypt && rm composer.lock && rm -rf vendor; \
+  cd /www && composer create-project roots/bedrock webroot && cd webroot && composer require roots/wp-password-bcrypt --no-update && rm composer.lock && rm -rf vendor; \
   chown -R www-data:www-data /www
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint
