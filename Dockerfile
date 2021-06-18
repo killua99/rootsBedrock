@@ -1,4 +1,4 @@
-FROM php:8-fpm-alpine
+FROM php:8-fpm-alpine as base-bedrock
 
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 ADD https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar wp-cli.phar
@@ -43,13 +43,20 @@ RUN set -ex; \
   export EXPECTED_CHECKSUM="$(php -r 'copy("https://composer.github.io/installer.sig", "php://stdout");')"; \
   export ACTUAL_CHECKSUM="$(php -r 'echo hash_file("sha384", "composer-setup.php");')"; \
   [ "$EXPECTED_CHECKSUM" != "$ACTUAL_CHECKSUM" ] || php composer-setup.php; \
-  chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp; \
+  chmod 755 wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp; \
   rm composer-setup.php; \
-  mv composer.phar /usr/local/bin/composer; \
+  mv composer.phar /usr/local/bin/composer;
+
+FROM base-bedrock as bedrock
+
+RUN set -ex; \
   mkdir /www; \
-  cd /www && composer create-project roots/bedrock webroot && cd webroot && composer require roots/wp-password-bcrypt && rm composer.lock && rm -rf vendor
+  cd /www && composer create-project roots/bedrock webroot && cd webroot && composer require roots/wp-password-bcrypt && rm composer.lock && rm -rf vendor; \
+  chown -R www-data:www-data /www
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+
+USER www-data
 
 ENTRYPOINT [ "docker-entrypoint" ]
 
