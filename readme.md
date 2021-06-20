@@ -1,0 +1,2 @@
+# WordPress Bedrock dockerized
+![Docker Image Size (latest semver)](https://img.shields.io/docker/image-size/killua99/bedrock?sort=semver) ![Docker Pulls](https://img.shields.io/docker/pulls/killua99/bedrock)
